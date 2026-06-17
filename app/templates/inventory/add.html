@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Artikel hinzufügen</h1>
+<div class="form-card">
+    <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="form-group">
+            <label for="name">Name *</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        <div class="form-group">
+            <label for="category">Kategorie</label>
+            <select id="category" name="category">
+                <option value="">-- bitte wählen --</option>
+                {% for cat in categories %}
+                <option value="{{ cat }}">{{ cat }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="purpose">Verwendungszweck</label>
+            <select id="purpose" name="purpose">
+                <option value="">-- bitte wählen --</option>
+                {% for value, label in purposes %}
+                <option value="{{ value }}">{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="location">Ort</label>
+            <input type="text" id="location" name="location" placeholder="z.B. Kühlschrank">
+        </div>
+        <div class="form-group">
+            <label for="quantity">Menge</label>
+            <input type="number" step="0.1" id="quantity" name="quantity" value="1">
+        </div>
+        <div class="form-group">
+            <label for="unit">Einheit</label>
+            <input type="text" id="unit" name="unit" placeholder="z.B. Stück, kg, Liter">
+        </div>
+        <div class="form-group">
+            <label for="min_quantity">Mindestmenge</label>
+            <input type="number" step="0.1" id="min_quantity" name="min_quantity" value="1">
+        </div>
+        <div class="form-group">
+            <label for="expiry_date">Ablaufdatum</label>
+            <input type="date" id="expiry_date" name="expiry_date">
+        </div>
+        <div class="form-group">
+            <label for="description">Beschreibung</label>
+            <textarea id="description" name="description" rows="3"
+                      placeholder="Zusätzliche Infos zum Artikel..."></textarea>
+        </div>
+        <button type="submit" class="btn">Speichern</button>
+    </form>
+</div>
+{% endblock %}

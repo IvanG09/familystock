@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>{{ item.name }}</h1>
+
+<div class="toolbar">
+    <a href="{{ url_for('inventory.edit_item', item_id=item.id) }}" class="btn btn-small">Bearbeiten</a>
+    <a href="{{ url_for('inventory.list_items') }}" class="btn btn-small">← Zurück zum Inventar</a>
+</div>
+
+<!-- Stammdaten -->
+<div class="form-card" style="max-width: 100%; margin-bottom: 1.5rem;">
+    <table>
+        <tr><th style="width: 200px;">Kategorie</th><td>{{ item.category or '-' }}</td></tr>
+        <tr><th>Verwendungszweck</th><td>
+            {% for value, label in [('verwenden','Zum Verwenden'),('verkaufen','Zum Verkaufen'),('ersatzteil','Für Ersatzteile'),('lager','Lager / Aufbewahren'),('sonstiges','Sonstiges')] %}
+                {% if value == item.purpose %}{{ label }}{% endif %}
+            {% endfor %}
+            {% if not item.purpose %}-{% endif %}
+        </td></tr>
+        <tr><th>Ort</th><td>{{ item.location or '-' }}</td></tr>
+        <tr><th>Aktuelle Menge</th><td><strong>{{ item.quantity }} {{ item.unit or '' }}</strong></td></tr>
+        <tr><th>Mindestmenge</th><td>{{ item.min_quantity }}</td></tr>
+        <tr><th>Ablaufdatum</th><td>{% if item.expiry_date %}{{ item.expiry_date.strftime('%d.%m.%Y') }}{% else %}-{% endif %}</td></tr>
+        <tr><th>Beschreibung</th><td>{{ item.description or '-' }}</td></tr>
+    </table>
+</div>
+
+<!-- Bestand anpassen -->
+<div class="form-card" style="max-width: 100%; margin-bottom: 1.5rem;">
+    <h2 style="margin-bottom: 1rem; color: #555;">Bestand anpassen</h2>
+    <form method="POST" action="{{ url_for('inventory.adjust_stock', item_id=item.id) }}"
+          style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="form-group" style="margin-bottom: 0;">
+            <label for="change_amount">Änderung (+/-)</label>
+            <input type="number" step="0.1" id="change_amount" name="change_amount"
+                   placeholder="z.B. -4 oder 12" required style="width: 150px;">
+        </div>
+        <div class="form-group" style="margin-bottom: 0; flex: 1;">
+            <label for="note">Notiz (optional)</label>
+            <input type="text" id="note" name="note" placeholder="z.B. Abendessen, Verkauft an...">
+        </div>
+        <button type="submit" class="btn">Übernehmen</button>
+    </form>
+    <p style="color: #666; margin-top: 0.8rem; font-size: 0.9rem;">
+        Negative Zahl = abziehen (z.B. -4), positive Zahl = hinzufügen (z.B. 12).
+    </p>
+</div>
+
+<!-- Änderungshistorie -->
+<div class="form-card" style="max-width: 100%;">
+    <h2 style="margin-bottom: 1rem; color: #555;">📜 Änderungshistorie</h2>
+    {% if changes %}
+    <table>
+        <thead>
+            <tr>
+                <th>Datum / Zeit</th>
+                <th>Wer</th>
+                <th>Änderung</th>
+                <th>Vorher → Nachher</th>
+                <th>Notiz</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for change in changes %}
+            <tr>
+                <td>{{ change.timestamp.strftime('%d.%m.%Y %H:%M') }}</td>
+                <td>{{ change.user.username }}</td>
+                <td style="color: {% if change.change_amount < 0 %}#c0392b{% else %}#2c7a4b{% endif %}; font-weight: bold;">
+                    {% if change.change_amount > 0 %}+{% endif %}{{ change.change_amount }}
+                </td>
+                <td>{{ change.quantity_before }} → {{ change.quantity_after }}</td>
+                <td>{{ change.note or '-' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Noch keine Änderungen erfasst.</p>
+    {% endif %}
+</div>
+{% endblock %}

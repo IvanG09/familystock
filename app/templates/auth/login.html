@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Anmelden</h1>
+<div class="form-card">
+    <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="form-group">
+            <label for="username">Benutzername</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Passwort</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <button type="submit" class="btn">Anmelden</button>
+    </form>
+    <p style="margin-top: 1rem;">
+        Noch kein Konto? <a href="{{ url_for('auth.register') }}">Jetzt registrieren</a>
+    </p>
+</div>
+{% endblock %}

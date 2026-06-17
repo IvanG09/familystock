@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>👨‍👩‍👧‍👦 {{ household.name }}</h1>
+
+<div class="form-card" style="max-width: 600px;">
+    <p style="margin-bottom: 1rem;">
+        <strong>Einladungscode:</strong>
+        <span style="font-size: 1.3rem; letter-spacing: 2px; background: #e8f5e9; padding: 0.3rem 0.8rem; border-radius: 6px;">{{ household.invite_code }}</span>
+    </p>
+    <p style="color: #666;">Gib diesen Code an deine Familie weiter, damit sie beim selben Haushalt beitreten können.</p>
+
+    <h2 style="margin: 1.5rem 0 0.8rem; color: #555;">Mitglieder</h2>
+    <table>
+        <thead>
+            <tr><th>Benutzername</th><th>E-Mail</th></tr>
+        </thead>
+        <tbody>
+            {% for member in members %}
+            <tr>
+                <td>{{ member.username }}</td>
+                <td>{{ member.email }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

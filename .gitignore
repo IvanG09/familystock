@@ -1,0 +1,16 @@
+# Virtual Environment
+venv/
+
+# Python
+__pycache__/
+*.pyc
+
+# Umgebungsvariablen (GEHEIM! Nie auf GitHub!)
+.env
+
+# Datenbank (lokal)
+instance/
+*.db
+
+# VS Code
+.vscode/

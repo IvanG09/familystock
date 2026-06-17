@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Registrieren</h1>
+<div class="form-card">
+    <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="form-group">
+            <label for="username">Benutzername</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <div class="form-group">
+            <label for="email">E-Mail</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Passwort</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+
+        <hr style="margin: 1.5rem 0; border: none; border-top: 1px solid #eee;">
+
+        <div class="form-group">
+            <label>Haushalt</label>
+            <label style="font-weight: normal;">
+                <input type="radio" name="mode" value="create" checked onclick="toggleMode()"> Neuen Haushalt erstellen
+            </label><br>
+            <label style="font-weight: normal;">
+                <input type="radio" name="mode" value="join" onclick="toggleMode()"> Bestehendem Haushalt beitreten
+            </label>
+        </div>
+
+        <div class="form-group" id="create-field">
+            <label for="household_name">Name des Haushalts</label>
+            <input type="text" id="household_name" name="household_name" placeholder="z.B. Familie Müller">
+        </div>
+
+        <div class="form-group" id="join-field" style="display: none;">
+            <label for="invite_code">Einladungscode</label>
+            <input type="text" id="invite_code" name="invite_code" placeholder="z.B. A1B2C3D4">
+        </div>
+
+        <button type="submit" class="btn">Registrieren</button>
+    </form>
+    <p style="margin-top: 1rem;">
+        Schon ein Konto? <a href="{{ url_for('auth.login') }}">Jetzt anmelden</a>
+    </p>
+</div>
+
+<script>
+// Zeigt je nach Auswahl das passende Feld an
+function toggleMode() {
+    const mode = document.querySelector('input[name="mode"]:checked').value;
+    document.getElementById('create-field').style.display = (mode === 'create') ? 'block' : 'none';
+    document.getElementById('join-field').style.display = (mode === 'join') ? 'block' : 'none';
+}
+</script>
+{% endblock %}

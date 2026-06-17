@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>📦 Inventar</h1>
+
+<div class="toolbar">
+    <a href="{{ url_for('inventory.add_item') }}" class="btn">+ Artikel hinzufügen</a>
+</div>
+
+<!-- Filter-Leiste -->
+<div class="form-card" style="max-width: 100%; margin-bottom: 1.5rem; padding: 1rem 1.5rem;">
+    <form method="GET" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
+        <div class="form-group" style="margin-bottom: 0;">
+            <label for="category">Kategorie</label>
+            <select id="category" name="category">
+                <option value="">Alle Kategorien</option>
+                {% for cat in categories %}
+                <option value="{{ cat }}" {% if cat == selected_category %}selected{% endif %}>{{ cat }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+            <label for="purpose">Verwendungszweck</label>
+            <select id="purpose" name="purpose">
+                <option value="">Alle</option>
+                {% for value, label in purposes %}
+                <option value="{{ value }}" {% if value == selected_purpose %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn">Filtern</button>
+        <a href="{{ url_for('inventory.list_items') }}" class="btn btn-danger">Zurücksetzen</a>
+    </form>
+</div>
+
+{% if items %}
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Kategorie</th>
+            <th>Zweck</th>
+            <th>Ort</th>
+            <th>Menge</th>
+            <th>Ablaufdatum</th>
+            <th>Aktionen</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in items %}
+        <tr>
+            <td><a href="{{ url_for('inventory.detail', item_id=item.id) }}">{{ item.name }}</a></td>
+            <td>{{ item.category or '-' }}</td>
+            <td>
+                {% for value, label in purposes %}
+                    {% if value == item.purpose %}{{ label }}{% endif %}
+                {% endfor %}
+                {% if not item.purpose %}-{% endif %}
+            </td>
+            <td>{{ item.location or '-' }}</td>
+            <td>
+                {{ item.quantity }} {{ item.unit or '' }}
+                {% if item.quantity <= item.min_quantity %}
+                    <span title="Niedriger Bestand" style="color: #e67e22; font-weight: bold;">⚠️</span>
+                {% endif %}
+            </td>
+            <td>
+                {% if item.expiry_date %}
+                    <span class="{% if item.expiry_date <= soon_date %}expiring{% endif %}">
+                        {{ item.expiry_date.strftime('%d.%m.%Y') }}
+                    </span>
+                    {% if item.expiry_date < today %}
+                        <span class="expiring">(abgelaufen!)</span>
+                    {% elif item.expiry_date <= soon_date %}
+                        <span class="expiring">(bald!)</span>
+                    {% endif %}
+                {% else %}-{% endif %}
+            </td>
+            <td>
+                <a href="{{ url_for('inventory.detail', item_id=item.id) }}" class="btn btn-small">Details</a>
+                <a href="{{ url_for('inventory.add_to_shopping', item_id=item.id) }}" class="btn btn-small">→ Einkauf</a>
+                <a href="{{ url_for('inventory.delete_item', item_id=item.id) }}" class="btn btn-small btn-danger" onclick="return confirm('Wirklich löschen?')">Löschen</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>Keine Artikel gefunden. {% if selected_category or selected_purpose %}Versuche einen anderen Filter.{% else %}Füge den ersten hinzu!{% endif %}</p>
+{% endif %}
+{% endblock %}

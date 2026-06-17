@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>🏠 Übersicht</h1>
+
+<!-- Statistik-Karten -->
+<div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 2rem;">
+    <div class="form-card" style="flex: 1; min-width: 180px; text-align: center;">
+        <div style="font-size: 2.5rem; font-weight: bold; color: #2c7a4b;">{{ total_items }}</div>
+        <div style="color: #666;">Artikel im Inventar</div>
+    </div>
+    <div class="form-card" style="flex: 1; min-width: 180px; text-align: center;">
+        <div style="font-size: 2.5rem; font-weight: bold; color: #c0392b;">{{ expiring|length }}</div>
+        <div style="color: #666;">Laufen bald ab</div>
+    </div>
+    <div class="form-card" style="flex: 1; min-width: 180px; text-align: center;">
+        <div style="font-size: 2.5rem; font-weight: bold; color: #e67e22;">{{ low_stock|length }}</div>
+        <div style="color: #666;">Niedriger Bestand</div>
+    </div>
+    <div class="form-card" style="flex: 1; min-width: 180px; text-align: center;">
+        <div style="font-size: 2.5rem; font-weight: bold; color: #2980b9;">{{ open_shopping }}</div>
+        <div style="color: #666;">Auf Einkaufsliste</div>
+    </div>
+</div>
+
+<!-- Bald ablaufende Artikel -->
+<div class="form-card" style="max-width: 100%; margin-bottom: 1.5rem;">
+    <h2 style="margin-bottom: 1rem; color: #c0392b;">⏰ Läuft bald ab</h2>
+    {% if expiring %}
+    <table>
+        <thead>
+            <tr><th>Name</th><th>Menge</th><th>Ablaufdatum</th></tr>
+        </thead>
+        <tbody>
+            {% for item in expiring %}
+            <tr>
+                <td><a href="{{ url_for('inventory.detail', item_id=item.id) }}">{{ item.name }}</a></td>
+                <td>{{ item.quantity }} {{ item.unit or '' }}</td>
+                <td class="{% if item.expiry_date <= today %}expiring{% endif %}">
+                    {{ item.expiry_date.strftime('%d.%m.%Y') }}
+                    {% if item.expiry_date < today %}(abgelaufen!){% elif item.expiry_date == today %}(heute!){% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Alles frisch – nichts läuft demnächst ab. 🎉</p>
+    {% endif %}
+</div>
+
+<!-- Niedriger Bestand -->
+<div class="form-card" style="max-width: 100%;">
+    <h2 style="margin-bottom: 1rem; color: #e67e22;">📉 Niedriger Bestand</h2>
+    {% if low_stock %}
+    <table>
+        <thead>
+            <tr><th>Name</th><th>Aktuelle Menge</th><th>Mindestmenge</th><th>Aktion</th></tr>
+        </thead>
+        <tbody>
+            {% for item in low_stock %}
+            <tr>
+                <td><a href="{{ url_for('inventory.detail', item_id=item.id) }}">{{ item.name }}</a></td>
+                <td>{{ item.quantity }} {{ item.unit or '' }}</td>
+                <td>{{ item.min_quantity }}</td>
+                <td><a href="{{ url_for('inventory.add_to_shopping', item_id=item.id) }}" class="btn btn-small">→ Einkaufsliste</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Alle Bestände sind ausreichend. 👍</p>
+    {% endif %}
+</div>
+{% endblock %}
