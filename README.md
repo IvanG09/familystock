@@ -68,7 +68,7 @@ familystock/
 
 1. **Repository klonen**
    ```bash
-   git clone <REPOSITORY-URL>
+   git clone https://github.com/IvanG09/familystock
    cd familystock
    ```
 
@@ -135,12 +135,12 @@ Authorization: Bearer <access_token>
 
 ```bash
 # 1. Token anfordern
-curl -X POST https://<host>/api/login \
+curl -X POST https://lab16.ifalabs.org/api/login \
   -H "Content-Type: application/json" \
   -d "{\"username\": \"max\", \"password\": \"meinpasswort\"}"
 
 # 2. Inventar abrufen (Token einsetzen)
-curl https://<host>/api/inventory \
+curl https://lab16.ifalabs.org/api/inventory \
   -H "Authorization: Bearer <access_token>"
 ```
 
